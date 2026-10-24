@@ -15,13 +15,18 @@
 
 - 20,000 个确定性合成异常 PDU 输入通过 UBSan 检查。macOS 27 的 ASan runtime 在进入 main 前自旋，已停止该测试进程；未将此项记为 ASan 通过，Linux CI 中保留 ASan+UBSan 验证。
 
+- 用户物理断电重插后再次验证通过：boot ID 再次变化，uptime 为 1 分钟；supervisor 由 PID 1 拉起，monitor 正常。持久队列从 3 条变为 4 条（新增本次启动事件），原有事件数量保留；程序 SHA-256 不变，密钥仍为 0600。这是一次真实断电恢复验证，不等同于随机掉电压力测试。
+
 ## 当前待验收
 
 - 未验证真实运营商下发短信：设备没有天线。
 - 未验证网卡独立 HTTPS 投递：没有蜂窝默认路由，时钟还未由可信来源校准。
 - 队列掉电容错经过原子 rename/fsync 设计与代码检查，未做随机硬断电压力测试。
-- GitHub 目标仓库尚待用户指定；本地源码包已独立于原项目私有证据目录。
 
 不能把“本机单元测试通过”“程序成功运行”或“安装自启链接”写成“运营商短信与脱机推送已经端到端通过”。
 
 设备密钥权限实测为 0600，目录 0700；程序 SHA-256：`9e41585f995c7b156f4b72b922ce20079838bf6b794ff6b7c8f69d0b4e3212af`。重启后 `/data` 约剩余 5864 KiB。
+
+## 开源发布
+
+仓库：[chinawrj/ec20-events](https://github.com/chinawrj/ec20-events)。源码与本地 Git 历史已执行真实密钥的原文、Base64 和十六进制精确匹配检查；公开代码不包含私有证据目录。Linux 自动测试、ASan/UBSan 与 ARM 交叉编译结果见 [GitHub Actions](https://github.com/chinawrj/ec20-events/actions)。

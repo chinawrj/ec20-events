@@ -1,5 +1,7 @@
 # EC20 Events
 
+[![Native tests](https://github.com/chinawrj/ec20-events/actions/workflows/test.yml/badge.svg)](https://github.com/chinawrj/ec20-events/actions/workflows/test.yml)
+
 在 Quectel EC20 OpenLinux 网卡内运行的轻量 C 程序：监听新短信、SIM 和蜂窝注册/附着状态变化，持久排队，通过 Pushover HTTPS API 通知手机。无需常驻电脑、浏览器、Python 或 Node.js。设备端使用一个静态 ARM ELF 和固件已有的原生 `/usr/bin/curl`；SysV init 的短 shell 脚本只负责启动和停止。
 
 ## 支持范围
@@ -13,7 +15,7 @@
 
 ## 实机验证状态
 
-详见 [验证记录](VALIDATION.md)。手机收到的最初 Hello World 经电脑网络发送，用户已确认收到。原生 ARM 程序已在网卡执行，安装到持久分区并通过服务启动/停止、采集进程恢复及 Linux 系统重启后自动运行测试。
+详见 [验证记录](VALIDATION.md)。手机收到的最初 Hello World 经电脑网络发送，用户已确认收到。原生 ARM 程序已在网卡执行，安装到持久分区并通过服务启动/停止、采集进程恢复、Linux 系统重启及物理断电重插后自动运行测试。
 
 当前设备没有天线，尚无蜂窝数据路由，启动时钟为 1980 年。因此**尚未验证脱离电脑后的真实短信接收及网卡直连 Pushover 投递**。程序遇到无效时钟会保留队列，绝不关闭 TLS 证书验证。接上天线、正确 APN/联网、校准时间是独立运行的前提；程序不负责拨号或重写 APN。
 
