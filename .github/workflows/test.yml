@@ -1,0 +1,21 @@
+name: native-tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Native C and synthetic AT/PDU/queue integration tests
+        env:
+          CC: clang
+        run: python3 tools/run_tests.py
+      - name: PDU parser memory-safety exercise
+        run: |
+          clang -g -O1 -fsanitize=address,undefined tests/fuzz_sms.c src/sms.c -o build/fuzz-sms
+          ./build/fuzz-sms
+      - name: Cross-compile ARMv7 static binary
+        run: |
+          python3 -m pip install ziglang==0.13.0
+          make arm ZIG="$(python3 -c 'import pathlib,ziglang; print(pathlib.Path(ziglang.__file__).parent / "zig")')"

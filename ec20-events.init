@@ -1,0 +1,31 @@
+#!/bin/sh
+# ec20-events managed SysV service; remove this file and its links to uninstall.
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+export PATH
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY all_proxy
+EC20_EVENTS_DIR=/data/ec20-events
+export EC20_EVENTS_DIR
+BIN=$EC20_EVENTS_DIR/ec20-events
+PID=/run/ec20-events.pid
+case "${1:-}" in
+ start)
+  [ -x "$BIN" ] || exit 1
+  start-stop-daemon -S -b -m -o -p "$PID" -x "$BIN" -- supervise || exit 1
+  # Let BusyBox finish detaching before an ADB install session closes.
+  sleep 1
+  start-stop-daemon -K -t -p "$PID" -x "$BIN" >/dev/null 2>&1 || exit 1
+  ;;
+ stop)
+  start-stop-daemon -K -o -p "$PID" -x "$BIN" -s TERM
+  # Sender's HTTPS timeout is 30 s. Do not SIGKILL during queue commits.
+  i=0
+  while start-stop-daemon -K -t -p "$PID" -x "$BIN" >/dev/null 2>&1; do
+   [ "$i" -lt 40 ] || exit 1
+   sleep 1; i=$((i + 1))
+  done
+  rm -f "$PID"
+  ;;
+ restart) "$0" stop && "$0" start ;;
+ status) "$BIN" status ;;
+ *) echo 'Usage: ec20-events {start|stop|restart|status}' >&2; exit 2 ;;
+esac

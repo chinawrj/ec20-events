@@ -1,0 +1,17 @@
+/build/
+/private/
+/evidence/
+/state/
+/outbox/
+/pending/
+.env
+.env.*
+app-token
+user-key
+*.pdu
+*.log
+*.zip
+*.pem
+*.key
+__pycache__/
+.DS_Store
